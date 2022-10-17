@@ -1,0 +1,26 @@
+[package]
+name = "ape-plugin"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+baseview = { git = "https://github.com/RustAudio/baseview", rev = "eae4033e7d2cc9c31ccaa2794d5d08eedf2f510c" }
+color-eyre = "0.6.2"
+dirs = "4.0.0"
+egui = "0.19.0"
+egui-baseview = { git = "https://github.com/BillyDM/egui-baseview", rev = "46e21cc11c57c705fb83611389399ec3d2670a44" }
+fundsp = "0.9.0"
+log = "0.4.17"
+log-panics = "2.1.0"
+num-derive = "0.3.3"
+num-traits = "0.2.15"
+rand = "0.8.5"
+raw-window-handle = "0.4.3"
+simplelog = "0.12.0"
+vst = "0.3.0"
+wmidi = "4.0.6"

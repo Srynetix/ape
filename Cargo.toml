@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "crates/ape-core",
+    "crates/ape-cli",
+    "crates/ape-bytebeats",
+    "crates/ape-plugin"
+]
