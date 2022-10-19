@@ -1,6 +1,4 @@
-use color_eyre::eyre;
-
-use ape_core::{process_stream, AudioOutput};
+use ape_core::{color_eyre::eyre, process_stream, AudioOutput};
 use rlua::Lua;
 
 fn bytebeats_to_f32(v: u32) -> f32 {
@@ -8,7 +6,8 @@ fn bytebeats_to_f32(v: u32) -> f32 {
 }
 
 pub fn run_bytebeats_synth(output: AudioOutput, formula: String) -> eyre::Result<()> {
-    let resample_ratio = 8_000.0 / output.sample_rate() as f32;
+    let sample_rate = output.sample_rate();
+    let resample_ratio = 8_000.0 / sample_rate as f32;
     let lua = Lua::new();
 
     lua.context(|ctx| {
@@ -20,7 +19,7 @@ pub fn run_bytebeats_synth(output: AudioOutput, formula: String) -> eyre::Result
     let sample_fn = move || {
         let t = count as u32;
 
-        let formula = lua.context(|ctx| {
+        let output = lua.context(|ctx| {
             let globs = ctx.globals();
             globs
                 .set("t", t)
@@ -30,7 +29,7 @@ pub fn run_bytebeats_synth(output: AudioOutput, formula: String) -> eyre::Result
                 .expect("could not evaluate the formula")
         });
 
-        let f = bytebeats_to_f32(formula);
+        let f = bytebeats_to_f32(output);
         count += resample_ratio;
         vec![f, f]
     };

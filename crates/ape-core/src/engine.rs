@@ -1,5 +1,6 @@
 use color_eyre::{eyre, eyre::eyre};
 use cpal::traits::{DeviceTrait, HostTrait};
+use tracing::{error, info};
 
 pub struct SampleRequestOptions {
     pub sample_rate: f32,
@@ -26,10 +27,15 @@ pub fn host_device_setup() -> eyre::Result<(cpal::Host, cpal::Device, cpal::Supp
     let device = host
         .default_output_device()
         .ok_or_else(|| eyre!("Default output device is not available"))?;
-    println!("Output device : {}", device.name()?);
+
+    info!(message = "Output device", name = device.name()?);
 
     let config = device.default_output_config()?;
-    println!("Default output config : {:?}", config);
+
+    info!(
+        message = "Default output config",
+        config = ?config
+    );
 
     Ok((host, device, config))
 }
@@ -50,7 +56,12 @@ where
         sample_clock,
         nchannels,
     };
-    let err_fn = |err| eprintln!("Error building output sound stream: {}", err);
+    let err_fn = |err| {
+        error!(
+            message = "Error building output sound stream",
+            error = %err
+        )
+    };
 
     let stream = device.build_output_stream(
         config,

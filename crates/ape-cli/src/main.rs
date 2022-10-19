@@ -2,12 +2,11 @@ use std::path::PathBuf;
 
 use ape_bytebeats::run_bytebeats_synth;
 use ape_core::{
+    color_eyre::{self, eyre},
     dsp::{build_dsp_chain, sample_noise_fn},
-    engine::host_device_setup,
-    process_stream, AudioOutput, DirectOutput, WavOutput,
+    process_stream, AudioOutput, WavOutput,
 };
 use clap::{Parser, Subcommand};
-use color_eyre::eyre;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -55,8 +54,7 @@ fn build_audio_output(args: &Args) -> eyre::Result<AudioOutput> {
             },
         }))
     } else {
-        let (_host, device, config) = host_device_setup()?;
-        Ok(AudioOutput::Direct(DirectOutput { device, config }))
+        AudioOutput::new_direct()
     }
 }
 
@@ -71,8 +69,15 @@ fn run_dsp_synth(output: AudioOutput) -> eyre::Result<()> {
     process_stream(output, sample_fn)
 }
 
+fn setup_logging() -> eyre::Result<()> {
+    tracing_subscriber::fmt().init();
+
+    Ok(())
+}
+
 fn main() -> eyre::Result<()> {
     color_eyre::install()?;
+    setup_logging()?;
 
     let args = Args::parse();
     let output = build_audio_output(&args)?;

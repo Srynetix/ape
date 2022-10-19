@@ -19,3 +19,15 @@ pub fn build_dsp_chain(sample_rate: u32) -> Box<dyn AudioUnit64> {
 
     Box::new(c)
 }
+
+pub fn build_dsp_chain_pitch(pitch: f64, sample_rate: u32) -> Box<dyn AudioUnit64> {
+    let c = lfo(move |t| {
+        let duty = lerp11(0.01, 0.99, sin_hz(0.05 * 4.0, t));
+        (pitch, duty)
+    }) >> pulse();
+
+    let mut c = c >> split::<U2>();
+    c.reset(Some(sample_rate as f64));
+
+    Box::new(c)
+}
